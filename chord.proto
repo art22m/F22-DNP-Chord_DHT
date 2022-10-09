@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+service InnoService {
+    rpc register(RegisterRequest) returns (RegisterReply) {}
+    rpc deregister(DeregisterRequest) returns (DeregisterReply) {}
+    rpc populateFingerTable(PopulateFingerTableRequest) returns (PopulateFingerTableReply) {}
+    rpc getChordInfo(getChordInfoRequest) returns (getChordInfoReply) {}
+}
+
+message RegisterRequest {
+    string ipaddr = 1;
+    string port = 2;
+}
+
+message RegisterReply {
+     int64 id = 1;
+     string message = 2;
+}
+
+message DeregisterRequest {
+    int64 id = 1;
+}
+
+message DeregisterReply {
+    bool result = 1;
+    string message = 2;
+}
+
+message PopulateFingerTableRequest {
+    int64 id = 1;
+}
+
+message PopulateFingerTableReply {
+    int64 id = 1;
+    repeated Node fingerTable = 2;
+}
+
+message getChordInfoRequest {
+    // Nothing
+}
+
+message getChordInfoReply {
+    repeated Node nodes = 1;
+}
+
+message Node {
+    int64 id = 1;
+    string ipaddr = 2;
+}
