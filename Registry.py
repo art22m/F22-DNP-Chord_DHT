@@ -155,6 +155,7 @@ def generate_node_id() -> int:
 
 
 def get_finger_table(node_id):
+    # TODO: Change to dict to avoid duplicates
     finger_table = []
 
     for i in range(0, KEY_SIZE):
