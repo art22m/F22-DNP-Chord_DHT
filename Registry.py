@@ -26,7 +26,7 @@ from concurrent import futures
 HOST = '127.0.0.1'
 PORT = '5555'
 
-KEY_SIZE = 4
+KEY_SIZE = 1
 
 SEED = 0
 MAX_WORKERS = 10
@@ -116,7 +116,7 @@ class RegistryHandler(pb2_grpc.RegistryServiceServicer):
 
         try:
             new_id = generate_node_id()
-            message = KEY_SIZE
+            message = str(KEY_SIZE)
 
             node_dict[new_id] = (ipaddr, port)
 
@@ -157,7 +157,7 @@ class RegistryHandler(pb2_grpc.RegistryServiceServicer):
 # Other Functions
 
 def generate_node_id() -> int:
-    if len(node_dict) == KEY_SIZE:
+    if len(node_dict) == 2 ** KEY_SIZE:
         raise Exception("Chord is full")
 
     while True:
@@ -249,6 +249,7 @@ def start_registry():
     server.start()
 
     log("Wait connection")
+
     try:
         server.wait_for_termination()
 

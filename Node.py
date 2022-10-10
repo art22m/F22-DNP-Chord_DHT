@@ -79,7 +79,10 @@ def start_node():
     connect_to_registry()
 
     # Try to register self in the chord
-    # register_in_chord()
+    register_in_chord()
+
+    # while 1:
+    #     q = 1
 
 
 if __name__ == '__main__':
