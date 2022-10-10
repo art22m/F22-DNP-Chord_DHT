@@ -13,7 +13,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0b\x63hord.proto\"/\n\x0fRegisterRequest\x12\x0e\n\x06ipaddr\x18\x01 \x01(\t\x12\x0c\n\x04port\x18\x02 \x01(\t\",\n\rRegisterReply\x12\n\n\x02id\x18\x01 \x01(\x03\x12\x0f\n\x07message\x18\x02 \x01(\t\"\x1f\n\x11\x44\x65registerRequest\x12\n\n\x02id\x18\x01 \x01(\x03\"2\n\x0f\x44\x65registerReply\x12\x0e\n\x06result\x18\x01 \x01(\x08\x12\x0f\n\x07message\x18\x02 \x01(\t\"(\n\x1aPopulateFingerTableRequest\x12\n\n\x02id\x18\x01 \x01(\x03\"B\n\x18PopulateFingerTableReply\x12\n\n\x02id\x18\x01 \x01(\x03\x12\x1a\n\x0b\x66ingerTable\x18\x02 \x03(\x0b\x32\x05.Node\"\x15\n\x13getChordInfoRequest\")\n\x11getChordInfoReply\x12\x14\n\x05nodes\x18\x01 \x03(\x0b\x32\x05.Node\"\"\n\x04Node\x12\n\n\x02id\x18\x01 \x01(\x03\x12\x0e\n\x06ipaddr\x18\x02 \x01(\t2\x80\x02\n\x0bInnoService\x12.\n\x08register\x12\x10.RegisterRequest\x1a\x0e.RegisterReply\"\x00\x12\x34\n\nderegister\x12\x12.DeregisterRequest\x1a\x10.DeregisterReply\"\x00\x12O\n\x13populateFingerTable\x12\x1b.PopulateFingerTableRequest\x1a\x19.PopulateFingerTableReply\"\x00\x12:\n\x0cgetChordInfo\x12\x14.getChordInfoRequest\x1a\x12.getChordInfoReply\"\x00\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0b\x63hord.proto\"/\n\x0fRegisterRequest\x12\x0e\n\x06ipaddr\x18\x01 \x01(\t\x12\x0c\n\x04port\x18\x02 \x01(\t\"1\n\rRegisterReply\x12\x0f\n\x07node_id\x18\x01 \x01(\x03\x12\x0f\n\x07message\x18\x02 \x01(\t\"$\n\x11\x44\x65registerRequest\x12\x0f\n\x07node_id\x18\x01 \x01(\x03\"2\n\x0f\x44\x65registerReply\x12\x0e\n\x06result\x18\x01 \x01(\x08\x12\x0f\n\x07message\x18\x02 \x01(\t\"-\n\x1aPopulateFingerTableRequest\x12\x0f\n\x07node_id\x18\x01 \x01(\x03\"H\n\x18PopulateFingerTableReply\x12\x0f\n\x07node_id\x18\x01 \x01(\x03\x12\x1b\n\x0c\x66inger_table\x18\x02 \x03(\x0b\x32\x05.Node\"\x15\n\x13GetChordInfoRequest\")\n\x11GetChordInfoReply\x12\x14\n\x05nodes\x18\x01 \x03(\x0b\x32\x05.Node\"\'\n\x04Node\x12\n\n\x02id\x18\x01 \x01(\x03\x12\x13\n\x0bsocket_addr\x18\x02 \x01(\t2\x84\x02\n\x0bInnoService\x12.\n\x08register\x12\x10.RegisterRequest\x1a\x0e.RegisterReply\"\x00\x12\x34\n\nderegister\x12\x12.DeregisterRequest\x1a\x10.DeregisterReply\"\x00\x12Q\n\x15populate_finger_table\x12\x1b.PopulateFingerTableRequest\x1a\x19.PopulateFingerTableReply\"\x00\x12<\n\x0eget_chord_info\x12\x14.GetChordInfoRequest\x1a\x12.GetChordInfoReply\"\x00\x62\x06proto3')
 
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, globals())
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'chord_pb2', globals())
@@ -23,21 +23,21 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _REGISTERREQUEST._serialized_start=15
   _REGISTERREQUEST._serialized_end=62
   _REGISTERREPLY._serialized_start=64
-  _REGISTERREPLY._serialized_end=108
-  _DEREGISTERREQUEST._serialized_start=110
-  _DEREGISTERREQUEST._serialized_end=141
-  _DEREGISTERREPLY._serialized_start=143
-  _DEREGISTERREPLY._serialized_end=193
-  _POPULATEFINGERTABLEREQUEST._serialized_start=195
-  _POPULATEFINGERTABLEREQUEST._serialized_end=235
-  _POPULATEFINGERTABLEREPLY._serialized_start=237
-  _POPULATEFINGERTABLEREPLY._serialized_end=303
-  _GETCHORDINFOREQUEST._serialized_start=305
-  _GETCHORDINFOREQUEST._serialized_end=326
-  _GETCHORDINFOREPLY._serialized_start=328
-  _GETCHORDINFOREPLY._serialized_end=369
-  _NODE._serialized_start=371
-  _NODE._serialized_end=405
-  _INNOSERVICE._serialized_start=408
-  _INNOSERVICE._serialized_end=664
+  _REGISTERREPLY._serialized_end=113
+  _DEREGISTERREQUEST._serialized_start=115
+  _DEREGISTERREQUEST._serialized_end=151
+  _DEREGISTERREPLY._serialized_start=153
+  _DEREGISTERREPLY._serialized_end=203
+  _POPULATEFINGERTABLEREQUEST._serialized_start=205
+  _POPULATEFINGERTABLEREQUEST._serialized_end=250
+  _POPULATEFINGERTABLEREPLY._serialized_start=252
+  _POPULATEFINGERTABLEREPLY._serialized_end=324
+  _GETCHORDINFOREQUEST._serialized_start=326
+  _GETCHORDINFOREQUEST._serialized_end=347
+  _GETCHORDINFOREPLY._serialized_start=349
+  _GETCHORDINFOREPLY._serialized_end=390
+  _NODE._serialized_start=392
+  _NODE._serialized_end=431
+  _INNOSERVICE._serialized_start=434
+  _INNOSERVICE._serialized_end=694
 # @@protoc_insertion_point(module_scope)

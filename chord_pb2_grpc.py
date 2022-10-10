@@ -24,15 +24,15 @@ class InnoServiceStub(object):
                 request_serializer=chord__pb2.DeregisterRequest.SerializeToString,
                 response_deserializer=chord__pb2.DeregisterReply.FromString,
                 )
-        self.populateFingerTable = channel.unary_unary(
-                '/InnoService/populateFingerTable',
+        self.populate_finger_table = channel.unary_unary(
+                '/InnoService/populate_finger_table',
                 request_serializer=chord__pb2.PopulateFingerTableRequest.SerializeToString,
                 response_deserializer=chord__pb2.PopulateFingerTableReply.FromString,
                 )
-        self.getChordInfo = channel.unary_unary(
-                '/InnoService/getChordInfo',
-                request_serializer=chord__pb2.getChordInfoRequest.SerializeToString,
-                response_deserializer=chord__pb2.getChordInfoReply.FromString,
+        self.get_chord_info = channel.unary_unary(
+                '/InnoService/get_chord_info',
+                request_serializer=chord__pb2.GetChordInfoRequest.SerializeToString,
+                response_deserializer=chord__pb2.GetChordInfoReply.FromString,
                 )
 
 
@@ -51,13 +51,13 @@ class InnoServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def populateFingerTable(self, request, context):
+    def populate_finger_table(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def getChordInfo(self, request, context):
+    def get_chord_info(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -76,15 +76,15 @@ def add_InnoServiceServicer_to_server(servicer, server):
                     request_deserializer=chord__pb2.DeregisterRequest.FromString,
                     response_serializer=chord__pb2.DeregisterReply.SerializeToString,
             ),
-            'populateFingerTable': grpc.unary_unary_rpc_method_handler(
-                    servicer.populateFingerTable,
+            'populate_finger_table': grpc.unary_unary_rpc_method_handler(
+                    servicer.populate_finger_table,
                     request_deserializer=chord__pb2.PopulateFingerTableRequest.FromString,
                     response_serializer=chord__pb2.PopulateFingerTableReply.SerializeToString,
             ),
-            'getChordInfo': grpc.unary_unary_rpc_method_handler(
-                    servicer.getChordInfo,
-                    request_deserializer=chord__pb2.getChordInfoRequest.FromString,
-                    response_serializer=chord__pb2.getChordInfoReply.SerializeToString,
+            'get_chord_info': grpc.unary_unary_rpc_method_handler(
+                    servicer.get_chord_info,
+                    request_deserializer=chord__pb2.GetChordInfoRequest.FromString,
+                    response_serializer=chord__pb2.GetChordInfoReply.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -131,7 +131,7 @@ class InnoService(object):
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
-    def populateFingerTable(request,
+    def populate_finger_table(request,
             target,
             options=(),
             channel_credentials=None,
@@ -141,14 +141,14 @@ class InnoService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/InnoService/populateFingerTable',
+        return grpc.experimental.unary_unary(request, target, '/InnoService/populate_finger_table',
             chord__pb2.PopulateFingerTableRequest.SerializeToString,
             chord__pb2.PopulateFingerTableReply.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
-    def getChordInfo(request,
+    def get_chord_info(request,
             target,
             options=(),
             channel_credentials=None,
@@ -158,8 +158,8 @@ class InnoService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/InnoService/getChordInfo',
-            chord__pb2.getChordInfoRequest.SerializeToString,
-            chord__pb2.getChordInfoReply.FromString,
+        return grpc.experimental.unary_unary(request, target, '/InnoService/get_chord_info',
+            chord__pb2.GetChordInfoRequest.SerializeToString,
+            chord__pb2.GetChordInfoReply.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

@@ -48,14 +48,20 @@ def get_predecessor_id(node_id) -> int:
     return predecessor_id
 
 
-node_dict[32] = 1
-node_dict[40] = 1
-node_dict[45] = 1
-node_dict[99] = 1
+# node_dict[32] = 1
+# node_dict[40] = 1
+# node_dict[45] = 1
+# node_dict[99] = 1
 # node_dict[132] = 1
 # node_dict[198] = 1
 # node_dict[234] = 1
 
-new_id = get_predecessor_id(31)
+# new_id = get_predecessor_id(31)
+#
+# print(new_id)
 
-print(new_id)
+socket_addr = ('123.123.2', 1233)
+ipaddr, port = socket_addr
+
+print(ipaddr)
+print(port)

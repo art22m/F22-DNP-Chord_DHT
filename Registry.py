@@ -33,9 +33,9 @@ MAX_WORKERS = 10
 
 random.seed(SEED)
 
-
 # Variables
 
+# {id : (ipaddr:port)}
 node_dict = {}
 
 
@@ -55,6 +55,8 @@ def get_error_message(error):
         return 'Please, run the registry again with argument <port> <size of key>\n example: python3 Registry.py 5000 5'
     elif error == 'invalid port':
         return 'Invalid format of the port, integer in the range [1, 65535] is expected'
+    elif error == 'invalid ip':
+        return 'Invalid format of the registry ip address.\n[0,127].[0,127].[0,127].[0,127] expected, example:127.0.0.1'
     elif error == 'invalid key size':
         return 'Invalid format of the key size, integer is expected'
     else:
@@ -65,9 +67,21 @@ def parse_arg(args):
     if len(args) != 3:
         terminate(get_error_message('invalid arg'))
 
+    # Ip address checking
+    ipaddress = args[1].split(':')[0]
+    num = ipaddress.split('.')
+    if len(num) != 4:
+        terminate(get_error_message('invalid arg'))
+    for i in num:
+        try:
+            if int(i) > 127 or int(i) < 0:
+                terminate(get_error_message('invalid ip'))
+        except:
+            terminate(get_error_message('invalid ip'))
+
     # Port checking
     try:
-        port = int(args[1])
+        port = int(args[1].split(':')[1])
     except:
         terminate(get_error_message('invalid port'))
 
@@ -82,9 +96,11 @@ def parse_arg(args):
 
     global PORT
     global KEY_SIZE
+    global HOST
 
     PORT = port
     KEY_SIZE = key_size
+    HOST = ipaddress
 
 
 # Registry Handler
@@ -92,7 +108,7 @@ def parse_arg(args):
 class RegistryHandler(pb2_grpc.InnoServiceServicer):
 
     def register(self, request, context):
-        ipaddr = request.ipaddr
+        ipaddr = request.socket_addr
         port = request.port
 
         try:
@@ -105,11 +121,10 @@ class RegistryHandler(pb2_grpc.InnoServiceServicer):
             new_id = -1
             message = str(error_message)
 
-        return pb2.RegisterReply(id=new_id, message=message)
-
+        return pb2.RegisterReply(node_id=new_id, message=message)
 
     def deregister(self, request, context):
-        node_id = request.id
+        node_id = request.node_id
 
         try:
             node_dict.pop(node_id)
@@ -122,24 +137,18 @@ class RegistryHandler(pb2_grpc.InnoServiceServicer):
 
         return pb2.DeregisterReply(result=result, message=message)
 
-
-    def populateFingerTable(self, request, context):
+    def populate_finger_table(self, request, context):
         node_id = request.id
 
         finger_table = get_finger_table(node_id)
-        finger_table_message = []
-
-        # TODO: Refactor
-        for row in finger_table:
-            # row[0] - successor id, row[1] - (ip_address, port)
-            finger_table_message.append(pb2.Node(id=row[0], ipaddr=f"{row[1][0]}:{row[1][1]}"))
 
         predecessor_id = get_predecessor_id(node_id)
-        return pb2.DeregisterReply(id=predecessor_id, fingerTable=finger_table_message)
+        return pb2.DeregisterReply(node_id=predecessor_id, finger_table=finger_table)
 
+    def get_chord_info(self, request, context):
+        registered_nodes = get_registered_nodes()
 
-    def getChordInfo(self, request, context):
-        raise NotImplementedError('Method not implemented!')
+        return pb2.GetChordInfoReply(nodes=registered_nodes)
 
 
 # Other Functions
@@ -155,15 +164,31 @@ def generate_node_id() -> int:
 
 
 def get_finger_table(node_id):
-    # TODO: Change to dict to avoid duplicates
-    finger_table = []
 
+    # Generate finger table
+    finger_table = {}
     for i in range(0, KEY_SIZE):
         pos = (node_id + 2 ** i) % (2 ** KEY_SIZE)
         successor_id = get_successor_id(pos)
-        finger_table.append((successor_id, node_dict[successor_id]))
+        finger_table[successor_id] = node_dict[successor_id]
 
-    return finger_table
+    # Cast finger table to messages list
+    finger_table_message = []
+    for successor_id, socket_addr in finger_table:
+        ipaddr, port = socket_addr
+        finger_table_message.append(pb2.Node(id=successor_id, socket_addr=f"{ipaddr}:{port}"))
+
+    return finger_table_message
+
+
+def get_registered_nodes():
+    registered_nodes = []
+
+    for node_id, socket_addr in node_dict.items():
+        ipaddr, port = socket_addr
+        registered_nodes.append(pb2.Node(id=node_id, socket_addr=f"{ipaddr}:{port}"))
+
+    return registered_nodes
 
 
 def get_successor_id(node_id) -> int:

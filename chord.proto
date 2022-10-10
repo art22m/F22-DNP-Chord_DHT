@@ -3,8 +3,8 @@ syntax = "proto3";
 service InnoService {
     rpc register(RegisterRequest) returns (RegisterReply) {}
     rpc deregister(DeregisterRequest) returns (DeregisterReply) {}
-    rpc populateFingerTable(PopulateFingerTableRequest) returns (PopulateFingerTableReply) {}
-    rpc getChordInfo(getChordInfoRequest) returns (getChordInfoReply) {}
+    rpc populate_finger_table(PopulateFingerTableRequest) returns (PopulateFingerTableReply) {}
+    rpc get_chord_info(GetChordInfoRequest) returns (GetChordInfoReply) {}
 }
 
 message RegisterRequest {
@@ -13,12 +13,12 @@ message RegisterRequest {
 }
 
 message RegisterReply {
-     int64 id = 1;
+     int64 node_id = 1;
      string message = 2;
 }
 
 message DeregisterRequest {
-    int64 id = 1;
+    int64 node_id = 1;
 }
 
 message DeregisterReply {
@@ -27,23 +27,23 @@ message DeregisterReply {
 }
 
 message PopulateFingerTableRequest {
-    int64 id = 1;
+    int64 node_id = 1;
 }
 
 message PopulateFingerTableReply {
-    int64 id = 1;
-    repeated Node fingerTable = 2;
+    int64 node_id = 1;
+    repeated Node finger_table = 2;
 }
 
-message getChordInfoRequest {
+message GetChordInfoRequest {
     // Nothing
 }
 
-message getChordInfoReply {
+message GetChordInfoReply {
     repeated Node nodes = 1;
 }
 
 message Node {
     int64 id = 1;
-    string ipaddr = 2;
+    string socket_addr = 2;
 }
