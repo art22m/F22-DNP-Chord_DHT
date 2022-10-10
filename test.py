@@ -1,3 +1,4 @@
+import threading
 
 KEY_SIZE = 8
 node_dict = {}
@@ -59,9 +60,18 @@ def get_predecessor_id(node_id) -> int:
 # new_id = get_predecessor_id(31)
 #
 # print(new_id)
+#
+# socket_addr = ('123.123.2', 1233)
+# ipaddr, port = socket_addr
+#
+# print(ipaddr)
+# print(port)
 
-socket_addr = ('123.123.2', 1233)
-ipaddr, port = socket_addr
+dct = {1: (1, 2)}
 
-print(ipaddr)
-print(port)
+print(dct.items())
+
+for key, value in dct.items():
+    print(key, value)
+
+

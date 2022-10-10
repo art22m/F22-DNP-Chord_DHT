@@ -26,7 +26,7 @@ from concurrent import futures
 HOST = '127.0.0.1'
 PORT = '5555'
 
-KEY_SIZE = 1
+KEY_SIZE = 2
 
 SEED = 0
 MAX_WORKERS = 10
@@ -141,12 +141,13 @@ class RegistryHandler(pb2_grpc.RegistryServiceServicer):
         return pb2.DeregisterReply(result=result, message=message)
 
     def populate_finger_table(self, request, context):
-        node_id = request.id
+        node_id = request.node_id
+        log(f"Request from {node_id}")
 
         finger_table = get_finger_table(node_id)
-
         predecessor_id = get_predecessor_id(node_id)
-        return pb2.DeregisterReply(node_id=predecessor_id, finger_table=finger_table)
+
+        return pb2.PopulateFingerTableReply(node_id=predecessor_id, finger_table=finger_table)
 
     def get_chord_info(self, request, context):
         registered_nodes = get_registered_nodes()
@@ -167,7 +168,6 @@ def generate_node_id() -> int:
 
 
 def get_finger_table(node_id):
-
     # Generate finger table
     finger_table = {}
     for i in range(0, KEY_SIZE):
@@ -177,7 +177,7 @@ def get_finger_table(node_id):
 
     # Cast finger table to messages list
     finger_table_message = []
-    for successor_id, socket_addr in finger_table:
+    for ipaddr, socket_addr in finger_table.items():
         ipaddr, port = socket_addr
         finger_table_message.append(pb2.Node(id=successor_id, socket_addr=f"{ipaddr}:{port}"))
 
@@ -200,8 +200,6 @@ def get_successor_id(node_id) -> int:
     min_delta = 2 ** KEY_SIZE
     successor_id = -1
     min_id = 2 ** KEY_SIZE
-
-    print(all_id)
 
     # Find the closest id to the given one and having the greater value
     for current_id in all_id:
