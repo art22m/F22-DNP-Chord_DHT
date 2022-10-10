@@ -5,8 +5,10 @@ import grpc
 import chord_pb2 as chord__pb2
 
 
-class InnoServiceStub(object):
-    """Missing associated documentation comment in .proto file."""
+class RegistryServiceStub(object):
+    """Registry
+
+    """
 
     def __init__(self, channel):
         """Constructor.
@@ -15,29 +17,31 @@ class InnoServiceStub(object):
             channel: A grpc.Channel.
         """
         self.register = channel.unary_unary(
-                '/InnoService/register',
+                '/RegistryService/register',
                 request_serializer=chord__pb2.RegisterRequest.SerializeToString,
                 response_deserializer=chord__pb2.RegisterReply.FromString,
                 )
         self.deregister = channel.unary_unary(
-                '/InnoService/deregister',
+                '/RegistryService/deregister',
                 request_serializer=chord__pb2.DeregisterRequest.SerializeToString,
                 response_deserializer=chord__pb2.DeregisterReply.FromString,
                 )
         self.populate_finger_table = channel.unary_unary(
-                '/InnoService/populate_finger_table',
+                '/RegistryService/populate_finger_table',
                 request_serializer=chord__pb2.PopulateFingerTableRequest.SerializeToString,
                 response_deserializer=chord__pb2.PopulateFingerTableReply.FromString,
                 )
         self.get_chord_info = channel.unary_unary(
-                '/InnoService/get_chord_info',
+                '/RegistryService/get_chord_info',
                 request_serializer=chord__pb2.GetChordInfoRequest.SerializeToString,
                 response_deserializer=chord__pb2.GetChordInfoReply.FromString,
                 )
 
 
-class InnoServiceServicer(object):
-    """Missing associated documentation comment in .proto file."""
+class RegistryServiceServicer(object):
+    """Registry
+
+    """
 
     def register(self, request, context):
         """Missing associated documentation comment in .proto file."""
@@ -64,7 +68,7 @@ class InnoServiceServicer(object):
         raise NotImplementedError('Method not implemented!')
 
 
-def add_InnoServiceServicer_to_server(servicer, server):
+def add_RegistryServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'register': grpc.unary_unary_rpc_method_handler(
                     servicer.register,
@@ -88,13 +92,15 @@ def add_InnoServiceServicer_to_server(servicer, server):
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'InnoService', rpc_method_handlers)
+            'RegistryService', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
 
 
  # This class is part of an EXPERIMENTAL API.
-class InnoService(object):
-    """Missing associated documentation comment in .proto file."""
+class RegistryService(object):
+    """Registry
+
+    """
 
     @staticmethod
     def register(request,
@@ -107,7 +113,7 @@ class InnoService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/InnoService/register',
+        return grpc.experimental.unary_unary(request, target, '/RegistryService/register',
             chord__pb2.RegisterRequest.SerializeToString,
             chord__pb2.RegisterReply.FromString,
             options, channel_credentials,
@@ -124,7 +130,7 @@ class InnoService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/InnoService/deregister',
+        return grpc.experimental.unary_unary(request, target, '/RegistryService/deregister',
             chord__pb2.DeregisterRequest.SerializeToString,
             chord__pb2.DeregisterReply.FromString,
             options, channel_credentials,
@@ -141,7 +147,7 @@ class InnoService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/InnoService/populate_finger_table',
+        return grpc.experimental.unary_unary(request, target, '/RegistryService/populate_finger_table',
             chord__pb2.PopulateFingerTableRequest.SerializeToString,
             chord__pb2.PopulateFingerTableReply.FromString,
             options, channel_credentials,
@@ -158,8 +164,75 @@ class InnoService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/InnoService/get_chord_info',
+        return grpc.experimental.unary_unary(request, target, '/RegistryService/get_chord_info',
             chord__pb2.GetChordInfoRequest.SerializeToString,
             chord__pb2.GetChordInfoReply.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+
+class NodeServiceStub(object):
+    """Node
+
+    """
+
+    def __init__(self, channel):
+        """Constructor.
+
+        Args:
+            channel: A grpc.Channel.
+        """
+        self.get_finger_table = channel.unary_unary(
+                '/NodeService/get_finger_table',
+                request_serializer=chord__pb2.GetFingerTableRequest.SerializeToString,
+                response_deserializer=chord__pb2.GetFingerTableReply.FromString,
+                )
+
+
+class NodeServiceServicer(object):
+    """Node
+
+    """
+
+    def get_finger_table(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+
+def add_NodeServiceServicer_to_server(servicer, server):
+    rpc_method_handlers = {
+            'get_finger_table': grpc.unary_unary_rpc_method_handler(
+                    servicer.get_finger_table,
+                    request_deserializer=chord__pb2.GetFingerTableRequest.FromString,
+                    response_serializer=chord__pb2.GetFingerTableReply.SerializeToString,
+            ),
+    }
+    generic_handler = grpc.method_handlers_generic_handler(
+            'NodeService', rpc_method_handlers)
+    server.add_generic_rpc_handlers((generic_handler,))
+
+
+ # This class is part of an EXPERIMENTAL API.
+class NodeService(object):
+    """Node
+
+    """
+
+    @staticmethod
+    def get_finger_table(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/NodeService/get_finger_table',
+            chord__pb2.GetFingerTableRequest.SerializeToString,
+            chord__pb2.GetFingerTableReply.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

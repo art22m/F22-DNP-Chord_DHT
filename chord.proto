@@ -1,6 +1,8 @@
 syntax = "proto3";
 
-service InnoService {
+// Registry
+
+service RegistryService {
     rpc register(RegisterRequest) returns (RegisterReply) {}
     rpc deregister(DeregisterRequest) returns (DeregisterReply) {}
     rpc populate_finger_table(PopulateFingerTableRequest) returns (PopulateFingerTableReply) {}
@@ -47,3 +49,46 @@ message Node {
     int64 id = 1;
     string socket_addr = 2;
 }
+
+
+// Node
+
+service NodeService {
+    rpc get_finger_table(GetFingerTableRequest) returns (GetFingerTableReply) {}
+//    rpc save(SaveRequest) returns (SaveReply) {}
+//    rpc remove(RemoveRequest) returns (RemoveReply) {}
+//    rpc find(FindRequest) returns (FindReply) {}
+}
+
+message GetFingerTableRequest {
+    // Nothing
+}
+
+message GetFingerTableReply {
+    repeated Node finger_table = 1;
+}
+
+//message SaveRequest {
+//
+//}
+//
+//message SaveReply {
+//
+//}
+//
+//message RemoveRequest {
+//
+//}
+//
+//message RemoveReply {
+//
+//}
+//
+//message FindRequest {
+//
+//}
+//
+//message FindReply {
+//
+//}
+

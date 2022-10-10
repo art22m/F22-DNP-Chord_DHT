@@ -105,11 +105,14 @@ def parse_arg(args):
 
 # Registry Handler
 
-class RegistryHandler(pb2_grpc.InnoServiceServicer):
+class RegistryHandler(pb2_grpc.RegistryServiceServicer):
 
     def register(self, request, context):
-        ipaddr = request.socket_addr
+        ipaddr = request.ipaddr
         port = request.port
+
+        print("New connection =)")
+        print(ipaddr, port)
 
         try:
             new_id = generate_node_id()
@@ -241,10 +244,11 @@ def get_predecessor_id(node_id) -> int:
 
 def start_registry():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=MAX_WORKERS))
-    pb2_grpc.add_InnoServiceServicer_to_server(RegistryHandler(), server)
+    pb2_grpc.add_RegistryServiceServicer_to_server(RegistryHandler(), server)
     server.add_insecure_port(f"{HOST}:{PORT}")
     server.start()
 
+    log("Wait connection")
     try:
         server.wait_for_termination()
 
@@ -258,4 +262,4 @@ if __name__ == '__main__':
     # TODO: uncomment
     # parse_arg(sys.argv)
 
-    # start_registry()
+    start_registry()
