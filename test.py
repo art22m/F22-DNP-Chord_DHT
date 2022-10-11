@@ -67,11 +67,5 @@ def get_predecessor_id(node_id) -> int:
 # print(ipaddr)
 # print(port)
 
-dct = {1: (1, 2)}
-
-print(dct.items())
-
-for key, value in dct.items():
-    print(key, value)
-
-
+msg = 'save 123 123 123 123 123123233 23'
+print(msg.split(' ', 2))

@@ -26,7 +26,7 @@ from concurrent import futures
 HOST = '127.0.0.1'
 PORT = '5555'
 
-KEY_SIZE = 2
+KEY_SIZE = 5
 
 SEED = 0
 MAX_WORKERS = 10
@@ -162,7 +162,7 @@ def generate_node_id() -> int:
         raise Exception("Chord is full")
 
     while True:
-        new_id = random.randint(0, KEY_SIZE)
+        new_id = random.randint(0, 2 ** KEY_SIZE - 1)
         if node_dict.get(new_id) is None:
             return new_id
 
@@ -170,15 +170,16 @@ def generate_node_id() -> int:
 def get_finger_table(node_id):
     # Generate finger table
     finger_table = {}
-    for i in range(0, KEY_SIZE):
-        pos = (node_id + 2 ** i) % (2 ** KEY_SIZE)
-        successor_id = get_successor_id(pos)
+    for i in range(0, KEY_SIZE - 1):
+        position = (node_id + 2 ** i) % (2 ** KEY_SIZE)
+        successor_id = get_successor_id(position)
         finger_table[successor_id] = node_dict[successor_id]
 
     # Cast finger table to messages list
     finger_table_message = []
-    for ipaddr, socket_addr in finger_table.items():
+    for successor_id, socket_addr in finger_table.items():
         ipaddr, port = socket_addr
+        print(successor_id, ipaddr, port, socket_addr)
         finger_table_message.append(pb2.Node(id=successor_id, socket_addr=f"{ipaddr}:{port}"))
 
     return finger_table_message
@@ -205,7 +206,7 @@ def get_successor_id(node_id) -> int:
     for current_id in all_id:
         delta = current_id - node_id
         min_id = min(min_id, current_id)
-        if 0 < delta < min_delta:
+        if 0 <= delta < min_delta:
             min_delta = delta
             successor_id = current_id
 
@@ -246,11 +247,10 @@ def start_registry():
     server.add_insecure_port(f"{HOST}:{PORT}")
     server.start()
 
-    log("Wait connection")
+    log("Register started")
 
     try:
         server.wait_for_termination()
-
     except KeyboardInterrupt as keys:
         terminate(f'{keys} was pressed, terminating server')
 
@@ -261,4 +261,7 @@ if __name__ == '__main__':
     # TODO: uncomment
     # parse_arg(sys.argv)
 
-    start_registry()
+    try:
+        start_registry()
+    except KeyboardInterrupt as keys:
+        terminate(f'{keys} was pressed, terminating server')
