@@ -3,6 +3,7 @@ import threading
 KEY_SIZE = 8
 node_dict = {}
 
+
 def get_successor_id(node_id) -> int:
     all_id = node_dict.keys()
 
@@ -69,3 +70,15 @@ def get_predecessor_id(node_id) -> int:
 
 msg = 'save 123 123 123 123 123123233 23'
 print(msg.split(' ', 2))
+
+mydict = {}
+mydict[2] = {'123', '23'}
+mydict[10] = {'12ads3', '23'}
+mydict[24] = {'9912', '23'}
+mydict[30] = {'23', '23'}
+
+dict_list = list(mydict.items())
+dict_list.sort()
+mapped_dict_list = list(map(lambda x: [x[0] + 2 ** 5, x[1]], dict_list))
+dict_list += mapped_dict_list
+print(-1 % 32)

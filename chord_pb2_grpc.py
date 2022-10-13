@@ -187,6 +187,21 @@ class NodeServiceStub(object):
                 request_serializer=chord__pb2.GetFingerTableRequest.SerializeToString,
                 response_deserializer=chord__pb2.GetFingerTableReply.FromString,
                 )
+        self.save = channel.unary_unary(
+                '/NodeService/save',
+                request_serializer=chord__pb2.SaveRequest.SerializeToString,
+                response_deserializer=chord__pb2.SaveReply.FromString,
+                )
+        self.remove = channel.unary_unary(
+                '/NodeService/remove',
+                request_serializer=chord__pb2.RemoveRequest.SerializeToString,
+                response_deserializer=chord__pb2.RemoveReply.FromString,
+                )
+        self.find = channel.unary_unary(
+                '/NodeService/find',
+                request_serializer=chord__pb2.FindRequest.SerializeToString,
+                response_deserializer=chord__pb2.FindReply.FromString,
+                )
 
 
 class NodeServiceServicer(object):
@@ -200,6 +215,24 @@ class NodeServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def save(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def remove(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def find(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_NodeServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -207,6 +240,21 @@ def add_NodeServiceServicer_to_server(servicer, server):
                     servicer.get_finger_table,
                     request_deserializer=chord__pb2.GetFingerTableRequest.FromString,
                     response_serializer=chord__pb2.GetFingerTableReply.SerializeToString,
+            ),
+            'save': grpc.unary_unary_rpc_method_handler(
+                    servicer.save,
+                    request_deserializer=chord__pb2.SaveRequest.FromString,
+                    response_serializer=chord__pb2.SaveReply.SerializeToString,
+            ),
+            'remove': grpc.unary_unary_rpc_method_handler(
+                    servicer.remove,
+                    request_deserializer=chord__pb2.RemoveRequest.FromString,
+                    response_serializer=chord__pb2.RemoveReply.SerializeToString,
+            ),
+            'find': grpc.unary_unary_rpc_method_handler(
+                    servicer.find,
+                    request_deserializer=chord__pb2.FindRequest.FromString,
+                    response_serializer=chord__pb2.FindReply.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -234,5 +282,56 @@ class NodeService(object):
         return grpc.experimental.unary_unary(request, target, '/NodeService/get_finger_table',
             chord__pb2.GetFingerTableRequest.SerializeToString,
             chord__pb2.GetFingerTableReply.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def save(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/NodeService/save',
+            chord__pb2.SaveRequest.SerializeToString,
+            chord__pb2.SaveReply.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def remove(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/NodeService/remove',
+            chord__pb2.RemoveRequest.SerializeToString,
+            chord__pb2.RemoveReply.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def find(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/NodeService/find',
+            chord__pb2.FindRequest.SerializeToString,
+            chord__pb2.FindReply.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

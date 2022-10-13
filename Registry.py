@@ -206,7 +206,7 @@ def get_successor_id(node_id) -> int:
     for current_id in all_id:
         delta = current_id - node_id
         min_id = min(min_id, current_id)
-        if 0 <= delta < min_delta:
+        if 0 < delta < min_delta:
             min_delta = delta
             successor_id = current_id
 
@@ -226,10 +226,14 @@ def get_predecessor_id(node_id) -> int:
 
     # Find the closest id to the given one and having the smaller value
     for current_id in all_id:
-        delta = current_id - node_id
+        delta = node_id - current_id
+        print(current_id, node_id, delta)
+        if delta <= 0:
+            delta = 2 ** KEY_SIZE
+
         max_id = max(max_id, current_id)
-        if delta < 0 and min_delta > abs(delta):
-            min_delta = abs(delta)
+        if delta < min_delta:
+            min_delta = delta
             predecessor_id = current_id
 
     # If no predecessor found, set it to the largest id in the chord

@@ -55,9 +55,9 @@ message Node {
 
 service NodeService {
     rpc get_finger_table(GetFingerTableRequest) returns (GetFingerTableReply) {}
-//    rpc save(SaveRequest) returns (SaveReply) {}
-//    rpc remove(RemoveRequest) returns (RemoveReply) {}
-//    rpc find(FindRequest) returns (FindReply) {}
+    rpc save(SaveRequest) returns (SaveReply) {}
+    rpc remove(RemoveRequest) returns (RemoveReply) {}
+    rpc find(FindRequest) returns (FindReply) {}
 }
 
 message GetFingerTableRequest {
@@ -69,27 +69,31 @@ message GetFingerTableReply {
     repeated Node finger_table = 2;
 }
 
-//message SaveRequest {
-//
-//}
-//
-//message SaveReply {
-//
-//}
-//
-//message RemoveRequest {
-//
-//}
-//
-//message RemoveReply {
-//
-//}
-//
-//message FindRequest {
-//
-//}
-//
-//message FindReply {
-//
-//}
+message SaveRequest {
+    string key = 1;
+    string text = 2;
+}
+
+message SaveReply {
+    bool result = 1;
+    string message = 2;
+}
+
+message RemoveRequest {
+    string key = 1;
+}
+
+message RemoveReply {
+    bool result = 1;
+    string message = 2;
+}
+
+message FindRequest {
+    string key = 1;
+}
+
+message FindReply {
+    bool result = 1;
+    string message = 2;
+}
 

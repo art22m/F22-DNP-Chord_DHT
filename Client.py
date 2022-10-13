@@ -26,7 +26,7 @@ from threading import Thread
 # Config
 
 SERVER_CONNECTION_TIMEOUT = 1.5
-SERVER_RESPONSE_TIMEOUT = 0.2
+SERVER_RESPONSE_TIMEOUT = 5
 
 registry_channel = None
 registry_stub = None
@@ -141,21 +141,45 @@ def get_info():
 
     else:
         log("You are not connected to the server.")
-        log("Try connect <ipaddr>:<port> command")
+        log("Try connect <ipaddr>:<port> command.")
+
 
 def save(key, text):
-    raise NotImplementedError('Method not implemented!')
+    if node_stub is not None:
+        message = pb2.SaveRequest(key=key, text=text)
+        get_response_from_node(message, node_stub.save)
+    else:
+        log('Please, connect to Node for text saving.')
 
 
 def remove(key):
-    raise NotImplementedError('Method not implemented!')
+    if node_stub is not None:
+        message = pb2.RemoveRequest(key=key)
+        get_response_from_node(message, node_stub.remove)
+    else:
+        log('Please, connect to Node for text saving.')
 
 
 def find(key):
-    raise NotImplementedError('Method not implemented!')
+    if node_stub is not None:
+        message = pb2.FindRequest(key=key)
+        get_response_from_node(message, node_stub.find)
+    else:
+        log('Please, connect to Node for text saving.')
 
+
+def get_response_from_node(message, rpc_func):
+    try:
+        get_response = rpc_func(message, timeout=SERVER_RESPONSE_TIMEOUT)
+    except grpc.RpcError as e:
+        log("Node response timeout exceeded. Please, connect again.")
+        log(e)
+        close_current_connection()
+        return
+    log(f'{get_response.result}, {get_response.message}')
 
 # Init
+
 
 def print_help():
     log("Unknown command.")
@@ -206,7 +230,7 @@ def start_client():
 
         # quit
         elif command == 'quit':
-            terminate("Terminating the client")
+            terminate("Terminating the client.")
 
         else:
             print_help()
@@ -218,4 +242,4 @@ if __name__ == '__main__':
     try:
         start_client()
     except KeyboardInterrupt as keys:
-        terminate(f'{keys} was pressed, terminating server')
+        terminate(f'{keys} was pressed, terminating server.')
