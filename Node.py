@@ -76,8 +76,7 @@ class NodeHandler(pb2_grpc.NodeServiceServicer):
     # This function is called by the client. It should just return the current finger table.
     def get_finger_table(self, request, context):
         log('Get finger table')
-
-        print(finger_table)
+        fetch_finger_table()
 
         finger_table_message = []
         for successor_id, socket_addr in finger_table.items():
@@ -88,17 +87,15 @@ class NodeHandler(pb2_grpc.NodeServiceServicer):
 
     # Saves the key and the text on the corresponding node
     def save(self, request, context):
+        fetch_finger_table()
+
         key = request.key
         text = request.text
-        hashed_key = hash_key(key)
 
+        hashed_key = hash_key(key)
         log(f'Save: {hashed_key}')
 
-        if predecessor_id is None:
-            fetch_finger_table()
-
         next_id = self._find_next_node_id(hashed_key)
-
         if next_id == -1:
             return pb2.SaveReply(result=False, message=f'Something go wrong, annot find next node.')
         elif next_id == node_id:
@@ -112,16 +109,14 @@ class NodeHandler(pb2_grpc.NodeServiceServicer):
 
     # Similar to the save method. But removes the key and the text from the corresponding node.
     def remove(self, request, context):
-        key = request.key
-        hashed_key = hash_key(key)
+        fetch_finger_table()
 
+        key = request.key
+
+        hashed_key = hash_key(key)
         log(f'Delete: {hashed_key}')
 
-        if predecessor_id is None:
-            fetch_finger_table()
-
         next_id = self._find_next_node_id(hashed_key)
-
         if next_id == -1:
             return pb2.RemoveReply(result=False, message=f'Something go wrong, cannot find next node.')
         elif next_id == node_id:
@@ -135,16 +130,14 @@ class NodeHandler(pb2_grpc.NodeServiceServicer):
 
     # Find the node, the key and the text should be saved on.
     def find(self, request, context):
-        key = request.key
-        hashed_key = hash_key(key)
+        fetch_finger_table()
 
+        key = request.key
+
+        hashed_key = hash_key(key)
         log(f'Find: {hashed_key}')
 
-        if predecessor_id is None:
-            fetch_finger_table()
-
         next_id = self._find_next_node_id(hashed_key)
-
         if next_id == -1:
             return pb2.FindReply(result=False, message=f'Something go wrong, cannot find next node.')
         elif next_id == node_id:
@@ -195,6 +188,7 @@ class NodeHandler(pb2_grpc.NodeServiceServicer):
             self.next_node_stub = pb2_grpc.NodeServiceStub(self.next_node_channel)
 
     def send_save_to_next_node(self, next_node_id, key, text):
+        print(next_node_id, key, text)
         self._connect_to_next_node(next_node_id)
 
         if self.next_node_stub is None:
@@ -341,9 +335,10 @@ def deregister_in_chord():
     except grpc.RpcError:
         terminate("Registry response timeout exceeded. Close the connection.")
 
-    # TODO: Add logic of deregister
-    # successor_id = get_current_node_successor_id()
-    # node_handler._send_save_to_next_node(successor_id, key)
+    successor_id = get_current_node_successor_id()
+    for key, value in node_dict.items():
+        print(key, value, successor_id)
+        node_handler.send_save_to_next_node(successor_id, str(key), value)
 
     registry_channel.close()
     if registry_response.result:  # success
