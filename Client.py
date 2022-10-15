@@ -17,11 +17,6 @@ import chord_pb2_grpc as pb2_grpc
 import grpc
 import sys
 import signal
-import time
-import threading
-
-from concurrent import futures
-from threading import Thread
 
 # Config
 
@@ -63,6 +58,7 @@ def close_current_connection():
     registry_stub = None
     node_channel = None
     node_stub = None
+
 
 def connect(ipaddr, port):
     # FIXME: Нужна не костыльная проверка, подключились ли с правильным стабом.
@@ -157,7 +153,7 @@ def remove(key):
         message = pb2.RemoveRequest(key=key)
         get_response_from_node(message, node_stub.remove)
     else:
-        log('Please, connect to Node for text saving.')
+        log('Please, connect to Node for removing.')
 
 
 def find(key):
@@ -165,7 +161,7 @@ def find(key):
         message = pb2.FindRequest(key=key)
         get_response_from_node(message, node_stub.find)
     else:
-        log('Please, connect to Node for text saving.')
+        log('Please, connect to Node for key finding.')
 
 
 def get_response_from_node(message, rpc_func):
@@ -176,7 +172,11 @@ def get_response_from_node(message, rpc_func):
         log(e)
         close_current_connection()
         return
-    log(f'{get_response.result}, {get_response.message}')
+
+    if get_response.result:
+        log(f'Complete: {get_response.message}')
+    else:
+        log(f'Error: {get_response.message}')
 
 # Init
 

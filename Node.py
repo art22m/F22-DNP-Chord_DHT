@@ -19,7 +19,6 @@ import sys
 import signal
 import time
 import zlib
-import threading
 
 from concurrent import futures
 from threading import Thread
@@ -38,11 +37,12 @@ REGISTRY_RESPONSE_TIMEOUT = 0.5
 NODE_CONNECTION_TIMEOUT = 1.5
 NODE_RESPONSE_TIMEOUT = 1
 
-SEED = 0
 MAX_WORKERS = 10
 
 registry_channel = None
 registry_stub = None
+
+node_handler = None
 
 # Variables
 
@@ -71,7 +71,14 @@ class NodeHandler(pb2_grpc.NodeServiceServicer):
     next_node_channel = None
     next_node_stub = None
 
+    # RPC Functions
+
+    # This function is called by the client. It should just return the current finger table.
     def get_finger_table(self, request, context):
+        log('Get finger table')
+
+        print(finger_table)
+
         finger_table_message = []
         for successor_id, socket_addr in finger_table.items():
             ipaddr, port = socket_addr
@@ -79,12 +86,13 @@ class NodeHandler(pb2_grpc.NodeServiceServicer):
 
         return pb2.GetFingerTableReply(node_id=node_id, finger_table=finger_table_message)
 
+    # Saves the key and the text on the corresponding node
     def save(self, request, context):
         key = request.key
         text = request.text
         hashed_key = hash_key(key)
 
-        print(f'Save: {hashed_key}')
+        log(f'Save: {hashed_key}')
 
         if predecessor_id is None:
             fetch_finger_table()
@@ -92,38 +100,84 @@ class NodeHandler(pb2_grpc.NodeServiceServicer):
         next_id = self._find_next_node_id(hashed_key)
 
         if next_id == -1:
-            return pb2.SaveReply(result=False, message=f'Error message')
+            return pb2.SaveReply(result=False, message=f'Something go wrong, annot find next node.')
         elif next_id == node_id:
             if node_dict.get(hashed_key) is not None:
-                return pb2.SaveReply(result=False, message=f'{key} is already exist in node {node_id}')
+                return pb2.SaveReply(result=False, message=f'Collision. Hash of {key} already exist in node {node_id}')
 
             node_dict[hashed_key] = text
             return pb2.SaveReply(result=True, message=f'{key} is saved in node {node_id}')
 
-        return self._send_save_to_next_node(next_id, key, text)
+        return self.send_save_to_next_node(next_id, key, text)
+
+    # Similar to the save method. But removes the key and the text from the corresponding node.
+    def remove(self, request, context):
+        key = request.key
+        hashed_key = hash_key(key)
+
+        log(f'Delete: {hashed_key}')
+
+        if predecessor_id is None:
+            fetch_finger_table()
+
+        next_id = self._find_next_node_id(hashed_key)
+
+        if next_id == -1:
+            return pb2.RemoveReply(result=False, message=f'Something go wrong, cannot find next node.')
+        elif next_id == node_id:
+            if node_dict.get(hashed_key) is None:
+                return pb2.RemoveReply(result=False, message=f'{key} is not exist')
+
+            node_dict.pop(hashed_key)
+            return pb2.RemoveReply(result=True, message=f'{key} is removed from node {node_id}')
+
+        return self._send_remove_to_next_node(next_id, key)
+
+    # Find the node, the key and the text should be saved on.
+    def find(self, request, context):
+        key = request.key
+        hashed_key = hash_key(key)
+
+        log(f'Find: {hashed_key}')
+
+        if predecessor_id is None:
+            fetch_finger_table()
+
+        next_id = self._find_next_node_id(hashed_key)
+
+        if next_id == -1:
+            return pb2.FindReply(result=False, message=f'Something go wrong, cannot find next node.')
+        elif next_id == node_id:
+            if node_dict.get(hashed_key) is None:
+                return pb2.FindReply(result=False, message=f'{key} is not exist')
+
+            return pb2.FindReply(result=True, message=f'{key} is storing at node {node_id}, address {HOST}:{PORT}')
+
+        return self._send_find_to_next_node(next_id, key)
+
+    # Helper Methods
 
     def _find_next_node_id(self, key):
-        print(f"i am = {node_id}")
-        print(f"predecessor = {predecessor_id}")
         if predecessor_id < key <= node_id or key <= node_id < predecessor_id or node_id < predecessor_id < key or node_id == key:
-            print("I am in state 1")
             return node_id
 
         successor_id = get_current_node_successor_id()
-        print(f"successor = {successor_id}")
         if node_id < key <= successor_id or successor_id < node_id < key or key <= successor_id < node_id or successor_id == key:
-            print("I am in state 2")
             return successor_id
 
         next_id = - 1
 
+        # If we have ids, for example: 2, 23, 30, and key_size equal to 5, I will make an array
+        # equal to 2, 23, 30, (2 + 32), (23 + 32), (30 + 32) = 2, 23, 30, 34, 55, 62 to find appropriate
+        # position for the key.
         dict_list = list(finger_table.items())
         dict_list.sort()
         mapped_dict_list = list(map(lambda x: [x[0] + 2 ** key_size, x[1]], dict_list))
         dict_list += mapped_dict_list
 
         for i in range(0, len(dict_list) - 1):
-            if dict_list[i][0] <= key < dict_list[i + 1][0] or dict_list[i][0] <= key + 2 ** key_size < dict_list[i + 1][0]:
+            if dict_list[i][0] <= key < dict_list[i + 1][0] or dict_list[i][0] <= key + 2 ** key_size < \
+                    dict_list[i + 1][0]:
                 next_id = dict_list[i][0]
                 break
 
@@ -136,13 +190,11 @@ class NodeHandler(pb2_grpc.NodeServiceServicer):
         try:
             grpc.channel_ready_future(self.next_node_channel).result(timeout=NODE_CONNECTION_TIMEOUT)
         except:
-            self.next_node_channel = None
-            self.next_node_stub = None
+            self._close_next_node_connection()
         else:
             self.next_node_stub = pb2_grpc.NodeServiceStub(self.next_node_channel)
 
-
-    def _send_save_to_next_node(self, next_node_id, key, text):
+    def send_save_to_next_node(self, next_node_id, key, text):
         self._connect_to_next_node(next_node_id)
 
         if self.next_node_stub is None:
@@ -152,22 +204,53 @@ class NodeHandler(pb2_grpc.NodeServiceServicer):
         try:
             get_save_key_response = self.next_node_stub.save(message, timeout=NODE_RESPONSE_TIMEOUT)
         except grpc.RpcError:
-            self.next_node_channel = None
-            self.next_node_stub = None
-            return pb2.SaveReply(result=False, message=f'Node response timeout exceeded.  {next_node_id}')
+            self._close_next_node_connection()
+            return pb2.SaveReply(result=False, message=f'Response timeout of node {next_node_id} exceeded.')
 
         self.next_node_channel.close()
-        self.next_node_channel = None
-        self.next_node_stub = None
+        self._close_next_node_connection()
 
         return get_save_key_response
 
+    def _send_remove_to_next_node(self, next_node_id, key):
+        self._connect_to_next_node(next_node_id)
 
-    #def remove(self, request, context):
-    #    raise NotImplementedError()
+        if self.next_node_stub is None:
+            return pb2.RemoveReply(result=False, message=f'Unable to connect to node {next_node_id}')
 
-    #def find(self, request, context):
-    #    raise NotImplementedError()
+        message = pb2.RemoveRequest(key=key)
+        try:
+            get_remove_key_response = self.next_node_stub.remove(message, timeout=NODE_RESPONSE_TIMEOUT)
+        except grpc.RpcError:
+            self._close_next_node_connection()
+            return pb2.RemoveReply(result=False, message=f'Response timeout of node {next_node_id} exceeded.')
+
+        self.next_node_channel.close()
+        self._close_next_node_connection()
+
+        return get_remove_key_response
+
+    def _send_find_to_next_node(self, next_node_id, key):
+        self._connect_to_next_node(next_node_id)
+
+        if self.next_node_stub is None:
+            return pb2.FindReply(result=False, message=f'Unable to connect to node {next_node_id}')
+
+        message = pb2.FindRequest(key=key)
+        try:
+            get_find_key_response = self.next_node_stub.find(message, timeout=NODE_RESPONSE_TIMEOUT)
+        except grpc.RpcError:
+            self._close_next_node_connection()
+            return pb2.FindReply(result=False, message=f'Response timeout of node {next_node_id} exceeded.')
+
+        self.next_node_channel.close()
+        self._close_next_node_connection()
+
+        return get_find_key_response
+
+    def _close_next_node_connection(self):
+        self.next_node_channel = None
+        self.next_node_stub = None
 
 
 def fetch_finger_table():
@@ -180,7 +263,6 @@ def fetch_finger_table():
     finger_table_message = populate_finger_table_response.finger_table
     new_finger_table = {}
 
-    # FIXME: Возможно будут проблемы с многопоточкой (мьютекс нунжен)
     for row in finger_table_message:
         ipaddr = row.socket_addr.split(':')[0]
         port = row.socket_addr.split(':')[1]
@@ -192,8 +274,8 @@ def fetch_finger_table():
     global finger_table
     finger_table = new_finger_table
 
-    log(f"Predecessor: {predecessor_id}")
-    log(f"Finger table: {finger_table}")
+    # log(f"Predecessor: {predecessor_id}")
+    # log(f"Finger table: {finger_table}")
 
 
 def get_current_node_successor_id():
@@ -260,6 +342,8 @@ def deregister_in_chord():
         terminate("Registry response timeout exceeded. Close the connection.")
 
     # TODO: Add logic of deregister
+    # successor_id = get_current_node_successor_id()
+    # node_handler._send_save_to_next_node(successor_id, key)
 
     registry_channel.close()
     if registry_response.result:  # success
@@ -282,8 +366,11 @@ def connect_to_registry():
 
 
 def start_node_server():
+    global node_handler
+    node_handler = NodeHandler()
+
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=MAX_WORKERS))
-    pb2_grpc.add_NodeServiceServicer_to_server(NodeHandler(), server)
+    pb2_grpc.add_NodeServiceServicer_to_server(node_handler, server)
     server.add_insecure_port(f"{HOST}:{PORT}")
     server.start()
 
@@ -315,17 +402,19 @@ def start_node():
     while True:
         message = input('> ')
 
-        if message == 'quit()':
+        if message == 'quit':
             deregister_in_chord()
         else:
             log("Unknown command.")
-            log("Available commands: \n (1) quit() - deregister node and terminate the program.")
+            log("Available commands: \n (1) quit - deregister node and terminate the program.")
 
 
 if __name__ == '__main__':
     signal.signal(signal.SIGINT, signal.default_int_handler)
+
     PORT = sys.argv[1]
-    print(PORT)
+    print(f"My port is {PORT}")
+
     try:
         start_node()
     except KeyboardInterrupt as keys:

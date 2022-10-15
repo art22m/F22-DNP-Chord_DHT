@@ -110,15 +110,12 @@ class RegistryHandler(pb2_grpc.RegistryServiceServicer):
     def register(self, request, context):
         ipaddr = request.ipaddr
         port = request.port
-
-        print("New connection =)")
-        print(ipaddr, port)
-
         try:
             new_id = generate_node_id()
             message = str(KEY_SIZE)
 
             node_dict[new_id] = (ipaddr, port)
+            log(f'Assigned id {new_id} to {ipaddr}:{port}')
 
         except Exception as error_message:
             new_id = -1
@@ -142,7 +139,8 @@ class RegistryHandler(pb2_grpc.RegistryServiceServicer):
 
     def populate_finger_table(self, request, context):
         node_id = request.node_id
-        log(f"Request from {node_id}")
+
+        log(f"Populate request from {node_id}")
 
         finger_table = get_finger_table(node_id)
         predecessor_id = get_predecessor_id(node_id)
@@ -159,7 +157,7 @@ class RegistryHandler(pb2_grpc.RegistryServiceServicer):
 
 def generate_node_id() -> int:
     if len(node_dict) == 2 ** KEY_SIZE:
-        raise Exception("Chord is full")
+        raise Exception("Chord is full now. Try again later.")
 
     while True:
         new_id = random.randint(0, 2 ** KEY_SIZE - 1)
@@ -170,8 +168,9 @@ def generate_node_id() -> int:
 def get_finger_table(node_id):
     # Generate finger table
     finger_table = {}
-    for i in range(0, KEY_SIZE - 1):
+    for i in range(0, KEY_SIZE):
         position = (node_id + 2 ** i) % (2 ** KEY_SIZE)
+
         successor_id = get_successor_id(position)
         finger_table[successor_id] = node_dict[successor_id]
 
@@ -179,7 +178,6 @@ def get_finger_table(node_id):
     finger_table_message = []
     for successor_id, socket_addr in finger_table.items():
         ipaddr, port = socket_addr
-        print(successor_id, ipaddr, port, socket_addr)
         finger_table_message.append(pb2.Node(id=successor_id, socket_addr=f"{ipaddr}:{port}"))
 
     return finger_table_message
@@ -206,7 +204,7 @@ def get_successor_id(node_id) -> int:
     for current_id in all_id:
         delta = current_id - node_id
         min_id = min(min_id, current_id)
-        if 0 < delta < min_delta:
+        if 0 <= delta < min_delta:
             min_delta = delta
             successor_id = current_id
 
@@ -227,7 +225,6 @@ def get_predecessor_id(node_id) -> int:
     # Find the closest id to the given one and having the smaller value
     for current_id in all_id:
         delta = node_id - current_id
-        print(current_id, node_id, delta)
         if delta <= 0:
             delta = 2 ** KEY_SIZE
 
@@ -251,7 +248,7 @@ def start_registry():
     server.add_insecure_port(f"{HOST}:{PORT}")
     server.start()
 
-    log("Register started")
+    log("Registry started")
 
     try:
         server.wait_for_termination()
