@@ -187,7 +187,7 @@ def print_help():
         "Available commands: \n "
         "(1) connect <ipaddr>:<port>\n "
         "(2) get_info\n "
-        "(3) save 'key' <text>\n "
+        "(3) save \"key\" <text>\n "
         "(4) remove key\n "
         "(5) find key\n "
         "(6) quit"
@@ -200,7 +200,7 @@ def start_client():
         client_input = input('> ')
 
         command = client_input.split(' ', 1)[0]
-        arguments = client_input.split(' ', 2)[1::]
+        arguments = client_input.split(' ', 1)[1::]
 
         # connect
         if command == 'connect':
@@ -214,9 +214,8 @@ def start_client():
 
         # save “key” <text>
         elif command == 'save':
-            key = arguments[0]
-            text = arguments[1]
-            save(key, text)
+            key, text = arguments[0].split("\" ")
+            save(key[1::], text)
 
         # remove key
         elif command == 'remove':

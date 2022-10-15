@@ -52,7 +52,8 @@ def log(message, end="\n"):
 
 def get_error_message(error):
     if error == 'invalid arg':
-        return 'Please, run the registry again with argument <port> <size of key>\n example: python3 Registry.py 5000 5'
+        return 'Please, run the registry again with argument <ipaddr>:<port> <size of key>\n ' \
+               'example: python3 Registry.py 127.0.0.1:5000 5'
     elif error == 'invalid port':
         return 'Invalid format of the port, integer in the range [1, 65535] is expected'
     elif error == 'invalid ip':
@@ -62,31 +63,66 @@ def get_error_message(error):
     else:
         return 'Invalid input'
 
+# ip address  checker
+def validate_ipaddr(ipaddr):
+    num = ipaddr.split('.')
+    if len(num) != 4:
+        return False, get_error_message('invalid arg')
+    for i in num:
+        try:
+            if int(i) > 127 or int(i) < 0:
+                return False, get_error_message('invalid ip')
+        except:
+            return False, get_error_message('invalid ip')
+    return True, ipaddr
+
+# port checker
+def validate_port(port):
+    if not port.isdigit():
+        return False, get_error_message('invalid port')
+
+    if int(port) > 65535 or int(port) < 1:
+        return False, get_error_message('invalid port')
+
+    return True, port
+
+# socket address checker
+def validate_socket_address(socket_addr):
+    # checking for <ip address>:<port>
+    if len(socket_addr.split(':')) != 2:
+        return False, get_error_message('invalid arg')
+
+    # ip address checking 
+    ipaddr = socket_addr.split(':')[0]
+    valid, res = validate_ipaddr(ipaddr)
+    if not valid:
+        return valid, res
+
+    # port checking
+    port = socket_addr.split(':')[1]
+    valid, res = validate_port(port)
+    if not valid:
+        return valid, res
+    
+    return True, socket_addr
 
 def parse_arg(args):
     if len(args) != 3:
         terminate(get_error_message('invalid arg'))
 
-    # Ip address checking
-    ipaddress = args[1].split(':')[0]
-    num = ipaddress.split('.')
-    if len(num) != 4:
-        terminate(get_error_message('invalid arg'))
-    for i in num:
-        try:
-            if int(i) > 127 or int(i) < 0:
-                terminate(get_error_message('invalid ip'))
-        except:
-            terminate(get_error_message('invalid ip'))
+    # Registry socket address checking
+    valid, res = validate_socket_address(args[1])
+    if not valid:
+        terminate(res)
 
-    # Port checking
-    try:
-        port = int(args[1].split(':')[1])
-    except:
-        terminate(get_error_message('invalid port'))
+    ip_address = args[1].split(':')[0]
+    port = args[1].split(':')[1]
 
-    if port > 65535 or port < 1:
-        terminate(get_error_message('invalid port'))
+    global HOST
+    global PORT
+
+    HOST = ip_address
+    PORT = port
 
     # Key checking
     try:
@@ -94,13 +130,8 @@ def parse_arg(args):
     except:
         terminate(get_error_message('invalid key size'))
 
-    global PORT
     global KEY_SIZE
-    global HOST
-
-    PORT = port
     KEY_SIZE = key_size
-    HOST = ipaddress
 
 
 # Registry Handler
@@ -259,8 +290,7 @@ def start_registry():
 if __name__ == '__main__':
     signal.signal(signal.SIGINT, signal.default_int_handler)
 
-    # TODO: uncomment
-    # parse_arg(sys.argv)
+    parse_arg(sys.argv)
 
     try:
         start_registry()

@@ -66,7 +66,94 @@ def terminate(message, closure=None):
 def log(message, end="\n"):
     print(message, end=end)
 
+def get_error_message(error):
+    if error == 'invalid arg':
+        return 'Please, run the node again with argument <registry-ipaddr>:<registry-port> <ipaddr>:<port>\n ' \
+               'example: python3 Node.py 127.0.0.1:5000 127.0.0.1:5001'
+    elif error == 'invalid port':
+        return 'Invalid format of the port, integer in the range [1, 65535] is expected'
+    elif error == 'invalid ip':
+        return 'Invalid format of the ip address.\n[0,127].[0,127].[0,127].[0,127] expected, example:127.0.0.1'
+    else:
+        return 'Invalid input'
 
+# ip address  checker
+def validate_ipaddr(ipaddr):
+    num = ipaddr.split('.')
+    if len(num) != 4:
+        return False, get_error_message('invalid arg')
+    for i in num:
+        try:
+            if int(i) > 127 or int(i) < 0:
+                return False, get_error_message('invalid ip')
+        except:
+            return False, get_error_message('invalid ip')
+    return True, ipaddr
+
+# port checker
+def validate_port(port):
+    if not port.isdigit():
+        return False, get_error_message('invalid port')
+
+    if int(port) > 65535 or int(port) < 1:
+        return False, get_error_message('invalid port')
+
+    return True, port
+
+# socket address checker
+def validate_socket_address(socket_addr):
+    # checking for <ip address>:<port>
+    if len(socket_addr.split(':')) != 2:
+        return False, get_error_message('invalid arg')
+
+    # ip address checking 
+    ipaddr = socket_addr.split(':')[0]
+    valid, res = validate_ipaddr(ipaddr)
+    if not valid:
+        return valid, res
+
+    # port checking
+    port = socket_addr.split(':')[1]
+    valid, res = validate_port(port)
+    if not valid:
+        return valid, res
+    
+    return True, socket_addr
+
+def parse_arg(args):
+    if len(args) != 3:
+        terminate(get_error_message('invalid arg'))
+
+    # Registry socket address checking
+    valid, res = validate_socket_address(args[1])
+    if not valid:
+        terminate(res)
+
+    registry_ip_address = args[1].split(':')[0]
+    registry_port = args[1].split(':')[1]
+
+    global REGISTRY_HOST
+    global REGISTRY_PORT
+
+    REGISTRY_HOST = registry_ip_address
+    REGISTRY_PORT = registry_port
+
+    # Node socket address checking
+    valid, res = validate_socket_address(args[2])
+    if not valid:
+        terminate(res)
+
+    node_ip_address = args[2].split(':')[0]
+    node_port = args[2].split(':')[1]
+
+    global HOST
+    global PORT
+
+    HOST = node_ip_address
+    PORT = node_port 
+
+
+# Node handler
 class NodeHandler(pb2_grpc.NodeServiceServicer):
     next_node_channel = None
     next_node_stub = None
@@ -188,7 +275,6 @@ class NodeHandler(pb2_grpc.NodeServiceServicer):
             self.next_node_stub = pb2_grpc.NodeServiceStub(self.next_node_channel)
 
     def send_save_to_next_node(self, next_node_id, key, text):
-        print(next_node_id, key, text)
         self._connect_to_next_node(next_node_id)
 
         if self.next_node_stub is None:
@@ -407,8 +493,7 @@ def start_node():
 if __name__ == '__main__':
     signal.signal(signal.SIGINT, signal.default_int_handler)
 
-    PORT = sys.argv[1]
-    print(f"My port is {PORT}")
+    parse_arg(sys.argv)
 
     try:
         start_node()
