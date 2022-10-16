@@ -202,6 +202,11 @@ class NodeServiceStub(object):
                 request_serializer=chord__pb2.FindRequest.SerializeToString,
                 response_deserializer=chord__pb2.FindReply.FromString,
                 )
+        self.get_data_from_successor = channel.unary_unary(
+                '/NodeService/get_data_from_successor',
+                request_serializer=chord__pb2.GetDataFromSuccessorRequest.SerializeToString,
+                response_deserializer=chord__pb2.GetDataFromSuccessorReply.FromString,
+                )
 
 
 class NodeServiceServicer(object):
@@ -233,6 +238,12 @@ class NodeServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def get_data_from_successor(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_NodeServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -255,6 +266,11 @@ def add_NodeServiceServicer_to_server(servicer, server):
                     servicer.find,
                     request_deserializer=chord__pb2.FindRequest.FromString,
                     response_serializer=chord__pb2.FindReply.SerializeToString,
+            ),
+            'get_data_from_successor': grpc.unary_unary_rpc_method_handler(
+                    servicer.get_data_from_successor,
+                    request_deserializer=chord__pb2.GetDataFromSuccessorRequest.FromString,
+                    response_serializer=chord__pb2.GetDataFromSuccessorReply.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -333,5 +349,22 @@ class NodeService(object):
         return grpc.experimental.unary_unary(request, target, '/NodeService/find',
             chord__pb2.FindRequest.SerializeToString,
             chord__pb2.FindReply.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def get_data_from_successor(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/NodeService/get_data_from_successor',
+            chord__pb2.GetDataFromSuccessorRequest.SerializeToString,
+            chord__pb2.GetDataFromSuccessorReply.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

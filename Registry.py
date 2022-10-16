@@ -63,6 +63,7 @@ def get_error_message(error):
     else:
         return 'Invalid input'
 
+
 # ip address  checker
 def validate_ipaddr(ipaddr):
     num = ipaddr.split('.')
@@ -76,6 +77,7 @@ def validate_ipaddr(ipaddr):
             return False, get_error_message('invalid ip')
     return True, ipaddr
 
+
 # port checker
 def validate_port(port):
     if not port.isdigit():
@@ -85,6 +87,7 @@ def validate_port(port):
         return False, get_error_message('invalid port')
 
     return True, port
+
 
 # socket address checker
 def validate_socket_address(socket_addr):
@@ -103,8 +106,9 @@ def validate_socket_address(socket_addr):
     valid, res = validate_port(port)
     if not valid:
         return valid, res
-    
+
     return True, socket_addr
+
 
 def parse_arg(args):
     if len(args) != 3:

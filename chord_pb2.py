@@ -13,7 +13,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0b\x63hord.proto\"/\n\x0fRegisterRequest\x12\x0e\n\x06ipaddr\x18\x01 \x01(\t\x12\x0c\n\x04port\x18\x02 \x01(\t\"1\n\rRegisterReply\x12\x0f\n\x07node_id\x18\x01 \x01(\x03\x12\x0f\n\x07message\x18\x02 \x01(\t\"$\n\x11\x44\x65registerRequest\x12\x0f\n\x07node_id\x18\x01 \x01(\x03\"2\n\x0f\x44\x65registerReply\x12\x0e\n\x06result\x18\x01 \x01(\x08\x12\x0f\n\x07message\x18\x02 \x01(\t\"-\n\x1aPopulateFingerTableRequest\x12\x0f\n\x07node_id\x18\x01 \x01(\x03\"H\n\x18PopulateFingerTableReply\x12\x0f\n\x07node_id\x18\x01 \x01(\x03\x12\x1b\n\x0c\x66inger_table\x18\x02 \x03(\x0b\x32\x05.Node\"\x15\n\x13GetChordInfoRequest\")\n\x11GetChordInfoReply\x12\x14\n\x05nodes\x18\x01 \x03(\x0b\x32\x05.Node\"\'\n\x04Node\x12\n\n\x02id\x18\x01 \x01(\x03\x12\x13\n\x0bsocket_addr\x18\x02 \x01(\t\"\x17\n\x15GetFingerTableRequest\"C\n\x13GetFingerTableReply\x12\x0f\n\x07node_id\x18\x01 \x01(\x03\x12\x1b\n\x0c\x66inger_table\x18\x02 \x03(\x0b\x32\x05.Node\"(\n\x0bSaveRequest\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\x0c\n\x04text\x18\x02 \x01(\t\",\n\tSaveReply\x12\x0e\n\x06result\x18\x01 \x01(\x08\x12\x0f\n\x07message\x18\x02 \x01(\t\"\x1c\n\rRemoveRequest\x12\x0b\n\x03key\x18\x01 \x01(\t\".\n\x0bRemoveReply\x12\x0e\n\x06result\x18\x01 \x01(\x08\x12\x0f\n\x07message\x18\x02 \x01(\t\"\x1a\n\x0b\x46indRequest\x12\x0b\n\x03key\x18\x01 \x01(\t\",\n\tFindReply\x12\x0e\n\x06result\x18\x01 \x01(\x08\x12\x0f\n\x07message\x18\x02 \x01(\t2\x88\x02\n\x0fRegistryService\x12.\n\x08register\x12\x10.RegisterRequest\x1a\x0e.RegisterReply\"\x00\x12\x34\n\nderegister\x12\x12.DeregisterRequest\x1a\x10.DeregisterReply\"\x00\x12Q\n\x15populate_finger_table\x12\x1b.PopulateFingerTableRequest\x1a\x19.PopulateFingerTableReply\"\x00\x12<\n\x0eget_chord_info\x12\x14.GetChordInfoRequest\x1a\x12.GetChordInfoReply\"\x00\x32\xc3\x01\n\x0bNodeService\x12\x42\n\x10get_finger_table\x12\x16.GetFingerTableRequest\x1a\x14.GetFingerTableReply\"\x00\x12\"\n\x04save\x12\x0c.SaveRequest\x1a\n.SaveReply\"\x00\x12(\n\x06remove\x12\x0e.RemoveRequest\x1a\x0c.RemoveReply\"\x00\x12\"\n\x04\x66ind\x12\x0c.FindRequest\x1a\n.FindReply\"\x00\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0b\x63hord.proto\"/\n\x0fRegisterRequest\x12\x0e\n\x06ipaddr\x18\x01 \x01(\t\x12\x0c\n\x04port\x18\x02 \x01(\t\"1\n\rRegisterReply\x12\x0f\n\x07node_id\x18\x01 \x01(\x03\x12\x0f\n\x07message\x18\x02 \x01(\t\"$\n\x11\x44\x65registerRequest\x12\x0f\n\x07node_id\x18\x01 \x01(\x03\"2\n\x0f\x44\x65registerReply\x12\x0e\n\x06result\x18\x01 \x01(\x08\x12\x0f\n\x07message\x18\x02 \x01(\t\"-\n\x1aPopulateFingerTableRequest\x12\x0f\n\x07node_id\x18\x01 \x01(\x03\"H\n\x18PopulateFingerTableReply\x12\x0f\n\x07node_id\x18\x01 \x01(\x03\x12\x1b\n\x0c\x66inger_table\x18\x02 \x03(\x0b\x32\x05.Node\"\x15\n\x13GetChordInfoRequest\")\n\x11GetChordInfoReply\x12\x14\n\x05nodes\x18\x01 \x03(\x0b\x32\x05.Node\"\'\n\x04Node\x12\n\n\x02id\x18\x01 \x01(\x03\x12\x13\n\x0bsocket_addr\x18\x02 \x01(\t\"\x17\n\x15GetFingerTableRequest\"\x1d\n\x1bGetDataFromSuccessorRequest\"7\n\x19GetDataFromSuccessorReply\x12\x1a\n\x04\x64\x61ta\x18\x01 \x03(\x0b\x32\x0c.SaveRequest\"C\n\x13GetFingerTableReply\x12\x0f\n\x07node_id\x18\x01 \x01(\x03\x12\x1b\n\x0c\x66inger_table\x18\x02 \x03(\x0b\x32\x05.Node\"(\n\x0bSaveRequest\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\x0c\n\x04text\x18\x02 \x01(\t\",\n\tSaveReply\x12\x0e\n\x06result\x18\x01 \x01(\x08\x12\x0f\n\x07message\x18\x02 \x01(\t\"\x1c\n\rRemoveRequest\x12\x0b\n\x03key\x18\x01 \x01(\t\".\n\x0bRemoveReply\x12\x0e\n\x06result\x18\x01 \x01(\x08\x12\x0f\n\x07message\x18\x02 \x01(\t\"\x1a\n\x0b\x46indRequest\x12\x0b\n\x03key\x18\x01 \x01(\t\",\n\tFindReply\x12\x0e\n\x06result\x18\x01 \x01(\x08\x12\x0f\n\x07message\x18\x02 \x01(\t2\x88\x02\n\x0fRegistryService\x12.\n\x08register\x12\x10.RegisterRequest\x1a\x0e.RegisterReply\"\x00\x12\x34\n\nderegister\x12\x12.DeregisterRequest\x1a\x10.DeregisterReply\"\x00\x12Q\n\x15populate_finger_table\x12\x1b.PopulateFingerTableRequest\x1a\x19.PopulateFingerTableReply\"\x00\x12<\n\x0eget_chord_info\x12\x14.GetChordInfoRequest\x1a\x12.GetChordInfoReply\"\x00\x32\x9a\x02\n\x0bNodeService\x12\x42\n\x10get_finger_table\x12\x16.GetFingerTableRequest\x1a\x14.GetFingerTableReply\"\x00\x12\"\n\x04save\x12\x0c.SaveRequest\x1a\n.SaveReply\"\x00\x12(\n\x06remove\x12\x0e.RemoveRequest\x1a\x0c.RemoveReply\"\x00\x12\"\n\x04\x66ind\x12\x0c.FindRequest\x1a\n.FindReply\"\x00\x12U\n\x17get_data_from_successor\x12\x1c.GetDataFromSuccessorRequest\x1a\x1a.GetDataFromSuccessorReply\"\x00\x62\x06proto3')
 
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, globals())
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'chord_pb2', globals())
@@ -40,22 +40,26 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _NODE._serialized_end=431
   _GETFINGERTABLEREQUEST._serialized_start=433
   _GETFINGERTABLEREQUEST._serialized_end=456
-  _GETFINGERTABLEREPLY._serialized_start=458
-  _GETFINGERTABLEREPLY._serialized_end=525
-  _SAVEREQUEST._serialized_start=527
-  _SAVEREQUEST._serialized_end=567
-  _SAVEREPLY._serialized_start=569
-  _SAVEREPLY._serialized_end=613
-  _REMOVEREQUEST._serialized_start=615
-  _REMOVEREQUEST._serialized_end=643
-  _REMOVEREPLY._serialized_start=645
-  _REMOVEREPLY._serialized_end=691
-  _FINDREQUEST._serialized_start=693
-  _FINDREQUEST._serialized_end=719
-  _FINDREPLY._serialized_start=721
-  _FINDREPLY._serialized_end=765
-  _REGISTRYSERVICE._serialized_start=768
-  _REGISTRYSERVICE._serialized_end=1032
-  _NODESERVICE._serialized_start=1035
-  _NODESERVICE._serialized_end=1230
+  _GETDATAFROMSUCCESSORREQUEST._serialized_start=458
+  _GETDATAFROMSUCCESSORREQUEST._serialized_end=487
+  _GETDATAFROMSUCCESSORREPLY._serialized_start=489
+  _GETDATAFROMSUCCESSORREPLY._serialized_end=544
+  _GETFINGERTABLEREPLY._serialized_start=546
+  _GETFINGERTABLEREPLY._serialized_end=613
+  _SAVEREQUEST._serialized_start=615
+  _SAVEREQUEST._serialized_end=655
+  _SAVEREPLY._serialized_start=657
+  _SAVEREPLY._serialized_end=701
+  _REMOVEREQUEST._serialized_start=703
+  _REMOVEREQUEST._serialized_end=731
+  _REMOVEREPLY._serialized_start=733
+  _REMOVEREPLY._serialized_end=779
+  _FINDREQUEST._serialized_start=781
+  _FINDREQUEST._serialized_end=807
+  _FINDREPLY._serialized_start=809
+  _FINDREPLY._serialized_end=853
+  _REGISTRYSERVICE._serialized_start=856
+  _REGISTRYSERVICE._serialized_end=1120
+  _NODESERVICE._serialized_start=1123
+  _NODESERVICE._serialized_end=1405
 # @@protoc_insertion_point(module_scope)

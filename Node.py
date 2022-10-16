@@ -66,6 +66,7 @@ def terminate(message, closure=None):
 def log(message, end="\n"):
     print(message, end=end)
 
+
 def get_error_message(error):
     if error == 'invalid arg':
         return 'Please, run the node again with argument <registry-ipaddr>:<registry-port> <ipaddr>:<port>\n ' \
@@ -181,7 +182,7 @@ class NodeHandler(pb2_grpc.NodeServiceServicer):
         text = request.text
 
         hashed_key = hash_key(key)
-        log(f'Save: {hashed_key}')
+        log(f'Save: {hashed_key} | {key}')
 
         next_id = self._find_next_node_id(hashed_key)
         if next_id == -1:
@@ -202,7 +203,7 @@ class NodeHandler(pb2_grpc.NodeServiceServicer):
         key = request.key
 
         hashed_key = hash_key(key)
-        log(f'Delete: {hashed_key}')
+        log(f'Delete: {hashed_key} | {key}')
 
         next_id = self._find_next_node_id(hashed_key)
         if next_id == -1:
@@ -223,7 +224,7 @@ class NodeHandler(pb2_grpc.NodeServiceServicer):
         key = request.key
 
         hashed_key = hash_key(key)
-        log(f'Find: {hashed_key}')
+        log(f'Find: {hashed_key} | {key}')
 
         next_id = self._find_next_node_id(hashed_key)
         if next_id == -1:
@@ -235,6 +236,26 @@ class NodeHandler(pb2_grpc.NodeServiceServicer):
             return pb2.FindReply(result=True, message=f'{key} is storing at node {node_id}, address {HOST}:{PORT}')
 
         return self._send_find_to_next_node(next_id, key)
+
+    # Find data which should store on predecessor and return it.
+    def get_data_from_successor(self, request, context):
+        fetch_finger_table()
+
+        messages = []
+        for hashed_key, data in list(node_dict.items()):
+            key, text = data
+
+            # If current hashed_key should be store in current node
+            if predecessor_id < hashed_key <= node_id or \
+                    hashed_key <= node_id < predecessor_id or \
+                    node_id < predecessor_id < hashed_key or \
+                    node_id == hashed_key:
+                continue
+
+            node_dict.pop(hashed_key)
+            messages.append(pb2.SaveRequest(key=key, text=text))
+
+        return pb2.GetDataFromSuccessorReply(data=messages)
 
     # Helper Methods
 
@@ -411,6 +432,41 @@ def register_in_chord():
     global key_size
     key_size = int(registry_response.message)
 
+    log(f"Registered in chord with id = {node_id}")
+
+    # Fetch finger table for the first time
+    fetch_finger_table()
+
+    # Get data from successor node
+    successor = get_current_node_successor_id()
+
+    # Nothing to fetch if we have 1 node in chord
+    if node_id == successor:
+        return
+
+    ipaddr, port = finger_table[successor]
+
+    # Connect to successor
+    next_node_channel = grpc.insecure_channel(f"{ipaddr}:{port}")
+    try:
+        grpc.channel_ready_future(next_node_channel).result(timeout=NODE_CONNECTION_TIMEOUT)
+    except:
+        log("Cannot connect to successor to request data")
+        return
+    next_node_stub = pb2_grpc.NodeServiceStub(next_node_channel)
+
+    # Make request
+    message = pb2.GetDataFromSuccessorRequest()
+    try:
+        response = next_node_stub.get_data_from_successor(message, timeout=NODE_RESPONSE_TIMEOUT)
+    except grpc.RpcError as e:
+        log("Successor node response timeout exceeded. Close the connection.")
+        return
+
+    # Add data to dictionary
+    for data in response.data:
+        node_dict[hash_key(data.key)] = (data.key, data.text)
+
 
 def deregister_in_chord():
     if node_id is None:
@@ -423,11 +479,13 @@ def deregister_in_chord():
         terminate("Registry response timeout exceeded. Close the connection.")
 
     successor_id = get_current_node_successor_id()
-    for hashed_key, value in node_dict.items():
+
+    # Nothing to transfer if we have 1 node in chord
+    if successor_id == node_id:
+        return
+
+    for hashed_key, value in list(node_dict.items()):
         key, text = value
-
-        print(key, value, successor_id)
-
         node_handler.send_save_to_next_node(successor_id, str(key), text)
 
     registry_channel.close()

@@ -213,17 +213,20 @@ def start_client():
 
         # save “key” <text>
         elif command == 'save':
+            if arguments[0].count("\"") != 2:
+                log("The key must be in quotes, try again")
+                continue
             key, text = arguments[0].split("\" ")
             save(key[1::], text)
 
         # remove key
         elif command == 'remove':
-            key = arguments
+            key = arguments[0]
             remove(key)
 
         # find key
         elif command == 'find':
-            key = arguments
+            key = arguments[0]
             find(key)
 
         # quit
