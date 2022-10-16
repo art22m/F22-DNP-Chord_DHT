@@ -169,7 +169,6 @@ def get_response_from_node(message, rpc_func):
         get_response = rpc_func(message, timeout=SERVER_RESPONSE_TIMEOUT)
     except grpc.RpcError as e:
         log("Node response timeout exceeded. Please, connect again.")
-        log(e)
         close_current_connection()
         return
 
@@ -219,12 +218,12 @@ def start_client():
 
         # remove key
         elif command == 'remove':
-            key = arguments[0]
+            key = arguments
             remove(key)
 
         # find key
         elif command == 'find':
-            key = arguments[0]
+            key = arguments
             find(key)
 
         # quit

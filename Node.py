@@ -154,6 +154,7 @@ def parse_arg(args):
 
 
 # Node handler
+
 class NodeHandler(pb2_grpc.NodeServiceServicer):
     next_node_channel = None
     next_node_stub = None
@@ -189,7 +190,7 @@ class NodeHandler(pb2_grpc.NodeServiceServicer):
             if node_dict.get(hashed_key) is not None:
                 return pb2.SaveReply(result=False, message=f'Collision. Hash of {key} already exist in node {node_id}')
 
-            node_dict[hashed_key] = text
+            node_dict[hashed_key] = (key, text)
             return pb2.SaveReply(result=True, message=f'{key} is saved in node {node_id}')
 
         return self.send_save_to_next_node(next_id, key, text)
@@ -422,9 +423,12 @@ def deregister_in_chord():
         terminate("Registry response timeout exceeded. Close the connection.")
 
     successor_id = get_current_node_successor_id()
-    for key, value in node_dict.items():
+    for hashed_key, value in node_dict.items():
+        key, text = value
+
         print(key, value, successor_id)
-        node_handler.send_save_to_next_node(successor_id, str(key), value)
+
+        node_handler.send_save_to_next_node(successor_id, str(key), text)
 
     registry_channel.close()
     if registry_response.result:  # success
