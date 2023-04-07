@@ -9,26 +9,25 @@ by first locating the node responsible for that key.
 
 Registry is responsible for registering and deregistering the nodes.
 
-### Registry features:
+#### Features:
 
-```
-● It holds a dictionary of id and address port pairsof all registered nodes.
-● Forms a finger-table for a specific node.
-● Helps a node to join the ring.
-● Every node knows about the registry.
-● It is the only centralized part of the chord.
-● There are no nodes in the ring at the start of the registry.
-```
-### Run command:
+1. It holds a dictionary of id and address port pairsof all registered nodes.
+2. Forms a finger-table for a specific node.
+3. Helps a node to join the ring.
+4. Every node knows about the registry.
+5. It is the only centralized part of the chord.
+6. There are no nodes in the ring at the start of the registry.
 
-```
+#### Run command:
+
+```bash
 python3 Registry.py <port> <m>
 ```
-Registry has several command-line arguments:
-● _port_ - port number registry should run on.
-● _m_ - size of key (in bits). Thus, max size of the chordring.
+- _port_ - port number registry should run on.
+-  _m_ - size of key (in bits). Thus, max size of the chordring.
 
-**Run command example:**
+#### Run command example:
+
 ```
 python3 Registry.py 5000 5
 ```
@@ -301,5 +300,4 @@ False, key Kazan does not exist
 >quit
 Shutting down
 ```
-
 
